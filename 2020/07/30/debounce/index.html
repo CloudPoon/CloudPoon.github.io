@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>js 函数的防抖(debounce)与节流(throttle) | skye</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="函数防抖（debounce）短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行。 1234567891011121314151617181920212223242526&#x2F;**   * @desc 函数防抖   * @param func 目标函数   * @param wait 延迟执行毫秒数   * @param immediate true - 立即执行， fals">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js 函数的防抖(debounce)与节流(throttle)">
+<meta property="og:url" content="http://yoursite.com/2020/07/30/debounce/index.html">
+<meta property="og:site_name" content="skye">
+<meta property="og:description" content="函数防抖（debounce）短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行。 1234567891011121314151617181920212223242526&#x2F;**   * @desc 函数防抖   * @param func 目标函数   * @param wait 延迟执行毫秒数   * @param immediate true - 立即执行， fals">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-07-30T07:53:04.000Z">
+<meta property="article:modified_time" content="2020-07-30T09:43:07.335Z">
+<meta property="article:author" content="skye">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="skye" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">skye</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/doc">dss开发文档</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-debounce" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/30/debounce/" class="article-date">
+  <time datetime="2020-07-30T07:53:04.000Z" itemprop="datePublished">2020-07-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      js 函数的防抖(debounce)与节流(throttle)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="函数防抖（debounce）"><a href="#函数防抖（debounce）" class="headerlink" title="函数防抖（debounce）"></a>函数防抖（debounce）</h2><p>短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">   * @desc 函数防抖</span><br><span class="line">   * @param func 目标函数</span><br><span class="line">   * @param <span class="built_in">wait</span> 延迟执行毫秒数</span><br><span class="line">   * @param immediate <span class="literal">true</span> - 立即执行， <span class="literal">false</span> - 延迟执行</span><br><span class="line">   */</span><br><span class="line"> <span class="keyword">function</span> debounce(func, <span class="built_in">wait</span>, immediate) &#123;</span><br><span class="line">    <span class="built_in">let</span> timer;</span><br><span class="line">    <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      <span class="built_in">let</span> context = this,</span><br><span class="line">      <span class="built_in">let</span> args = arguments;</span><br><span class="line">           </span><br><span class="line">      <span class="keyword">if</span> (timer) clearTimeout(timer);</span><br><span class="line">      <span class="keyword">if</span> (immediate) &#123;</span><br><span class="line">        <span class="built_in">let</span> callNow = !timer;</span><br><span class="line">        timer = setTimeout(() =&gt; &#123;</span><br><span class="line">          timer = null;</span><br><span class="line">        &#125;, <span class="built_in">wait</span>);</span><br><span class="line">        <span class="keyword">if</span> (callNow) func.apply(context, args);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        timer  = setTimeout(() =&gt; &#123;</span><br><span class="line">          func.apply(context, args);</span><br><span class="line">        &#125;, <span class="built_in">wait</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="节流-throttle"><a href="#节流-throttle" class="headerlink" title="节流(throttle)"></a>节流(throttle)</h2><p>指连续触发事件但是在 n 秒中只执行一次函数。即 2n 秒内执行 2 次… 。节流如字面意思，会稀释函数的执行频率。</p>
+<p>时间戳版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> throttle(func, <span class="built_in">wait</span>) &#123;</span><br><span class="line">    <span class="built_in">let</span> previous = 0;</span><br><span class="line">    <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      <span class="built_in">let</span> now = Date.now();</span><br><span class="line">      <span class="built_in">let</span> context = this;</span><br><span class="line">      <span class="built_in">let</span> args = arguments;</span><br><span class="line">      <span class="keyword">if</span> (now - previous &gt; <span class="built_in">wait</span>) &#123;</span><br><span class="line">        func.apply(context, args);</span><br><span class="line">        previous = now;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定时器版：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> throttle(func, <span class="built_in">wait</span>) &#123;</span><br><span class="line">    <span class="built_in">let</span> timeout;</span><br><span class="line">    <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      <span class="built_in">let</span> context = this;</span><br><span class="line">      <span class="built_in">let</span> args = arguments;</span><br><span class="line">      <span class="keyword">if</span> (!timeout) &#123;</span><br><span class="line">        timeout = setTimeout(() =&gt; &#123;</span><br><span class="line">          timeout = null;</span><br><span class="line">          func.apply(context, args)</span><br><span class="line">        &#125;, <span class="built_in">wait</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们应该可以很容易的发现，其实时间戳版和定时器版的节流函数的区别就是，时间戳版的函数触发是在时间段内开始的时候，而定时器版的函数触发是在时间段内结束的时候。</p>
+<p>我们也可以将时间戳版和定时器版的节流函数结合起来</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @desc 函数节流</span><br><span class="line"> * @param func 函数</span><br><span class="line"> * @param <span class="built_in">wait</span> 延迟执行毫秒数</span><br><span class="line"> * @param <span class="built_in">type</span> 1 表时间戳版，2 表定时器版</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> throttle(func, <span class="built_in">wait</span>, <span class="built_in">type</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">type</span> === 1) &#123;</span><br><span class="line">    <span class="built_in">let</span> previous = 0;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">type</span> === 2) &#123;</span><br><span class="line">    <span class="built_in">let</span> timeout;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">let</span> context = this;</span><br><span class="line">    <span class="built_in">let</span> args = arguments;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">type</span> === 1) &#123;</span><br><span class="line">        <span class="built_in">let</span> now = Date.now();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (now - previous &gt; <span class="built_in">wait</span>) &#123;</span><br><span class="line">          func.apply(context, args);</span><br><span class="line">          previous = now;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">type</span> === 2) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!timeout) &#123;</span><br><span class="line">        timeout = setTimeout(() =&gt; &#123;</span><br><span class="line">          timeout = null;</span><br><span class="line">          func.apply(context, args)</span><br><span class="line">        &#125;, <span class="built_in">wait</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h5 id="相同点："><a href="#相同点：" class="headerlink" title="相同点："></a>相同点：</h5><p>都可以通过使用 setTimeout 实现。<br>目的都是，降低回调执行频率。节省计算资源。</p>
+<h5 id="不同点："><a href="#不同点：" class="headerlink" title="不同点："></a>不同点：</h5><p>函数防抖，在一段连续操作结束后，处理回调，利用clearTimeout 和 setTimeout实现。函数节流，在一段连续操作中，每一段时间只执行一次，频率较高的事件中使用来提高性能。<br>函数防抖关注一定时间连续触发的事件只在最后执行一次，而函数节流侧重于一段时间内只执行一次。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h5 id="函数防抖的应用场景"><a href="#函数防抖的应用场景" class="headerlink" title="函数防抖的应用场景"></a>函数防抖的应用场景</h5><p>连续的事件，只需触发一次回调的场景有：</p>
+<p>搜索框搜索输入。只需用户最后一次输入完，再发送请求<br>手机号、邮箱验证输入检测<br>窗口大小Resize。只需窗口调整完成后，计算窗口大小。防止重复渲染。</p>
+<h5 id="函数节流的应用场景"><a href="#函数节流的应用场景" class="headerlink" title="函数节流的应用场景"></a>函数节流的应用场景</h5><p>间隔一段时间执行一次回调的场景有：</p>
+<p>滚动加载，加载更多或滚到底部监听<br>谷歌搜索框，搜索联想功能<br>高频点击提交，表单重复提交</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/30/debounce/" data-id="ckg96yt4h0001zmqr2yjb7qd7" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/07/30/first/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Vue开发技巧</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 skye<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/doc" class="mobile-nav-link">dss开发文档</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
