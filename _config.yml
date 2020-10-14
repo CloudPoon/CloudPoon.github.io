@@ -105,7 +105,7 @@ theme: landscape
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/CloudPoon/skye-hexo.github.io
+  repo: https://github.com/CloudPoon/CloudPoon.github.io
   # example, https://github.com/hexojs/hexojs.github.io
   branch: gh-pages
 
